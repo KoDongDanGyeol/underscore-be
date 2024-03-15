@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  underscore-database:
+    container_name: underscore-database
+    build:
+      dockerfile: Dockerfile
+      context: ./database
+    image: underscore-database
+    environment:
+      - MYSQL_DATABASE=underscore
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ~/data-underscore/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+  underscore-app:
+    container_name: underscore-app
+    build: .
+    depends_on:
+      - underscore-database
+    image: underscore-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    restart: always
