@@ -32,7 +32,7 @@ public class AdministrativeDistrict {
     // 행정기관 생성일
     private String administrativeOrganizationCreationDate;
 
-    // 행정기관 생성일
+    // 행정기관 만료일
     private String administrativeOrganizationCancellationDate;
 
 
