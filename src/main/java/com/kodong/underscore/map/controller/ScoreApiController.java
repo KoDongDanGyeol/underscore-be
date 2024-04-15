@@ -19,6 +19,7 @@ public class ScoreApiController {
     @GetMapping("serviceIndustryData")
     public ResponseEntity<Map<String,String>> allServiceIndustryInfo(){
         Map<String,String> dtos = scoreApiService.allServiceIndustryData();
+        scoreApiService.updateThresholds();
 
         return ResponseEntity.ok().body(dtos);
     }

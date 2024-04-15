@@ -1,5 +1,6 @@
 package com.kodong.underscore.map.config;
 
+import com.kodong.underscore.map.batch.SequentialJobListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
@@ -28,16 +29,17 @@ public class BatchConfig {
 
     @Bean
     public Job processDataInsertJob(JobRepository jobRepository,
-                                    Step administrativeDistrictStep, Step serviceIndustryStep,
+                                    Step administrativeDistrictStep, Step serviceIndustryStep, Step legalDistrictStep,
                                     Step storeStep, Step floatingPopulationStep, Step incomeConsumptionStep,
-                                    Step indexQuarterlyQuotientStep, Step residentPopulationStep, Step sellingStep) {
+                                    Step indexQuarterlyQuotientStep, Step residentPopulationStep, Step sellingStep, SequentialJobListener sequentialJobListener) {
 
 
         // 먼저 실행할 Step의 Flow를 정의
         Flow dataInputFlow = new FlowBuilder<Flow>("dataInut")
                 .split(taskExecutor())
                 .add(new FlowBuilder<Flow>("administrativeDongFlow").start(administrativeDistrictStep).end(),
-                        new FlowBuilder<Flow>("serviceIndustryFlow").start(serviceIndustryStep).end())
+                        new FlowBuilder<Flow>("serviceIndustryFlow").start(serviceIndustryStep).end(),
+                        new FlowBuilder<Flow>("legalDongFlow").start(legalDistrictStep).end())
                 .build();
 
         Flow parallelSteps = new FlowBuilder<Flow>("parallelSteps")
@@ -61,6 +63,33 @@ public class BatchConfig {
                 .incrementer(new RunIdIncrementer())
                 .start(jobFlow)
                 .end()// storeStep은 Stor 처리 관련 Step
+                .listener(sequentialJobListener)
+                .build();
+    }
+
+    @Bean
+    public Job businessAttractionInitJob(JobRepository jobRepository,Step businessAttractionInitStep,SequentialJobListener sequentialJobListener) {
+        return new JobBuilder("businessAttractionInitJob",jobRepository)
+                .start(businessAttractionInitStep)
+                .listener(sequentialJobListener)
+                .build();
+    }
+
+    @Bean
+    public Job businessAttractionUpdateJob(JobRepository jobRepository,
+                                           Step businessAttractionUpdateFlpopScoreStep,
+                                           Step businessAttractionUpdateIncomeConsumptionScoreStep,
+                                           Step businessAttractionUpdateIndexQuarterlyQuotientScoreStep,
+                                           Step businessAttractionUpdateSellingScoreStep,
+                                           Step businessAttractionUpdateResidentPopulationScoreStep,
+                                           Step businessAttractionUpdateStoreScoreStep) {
+        return new JobBuilder("businessAttractionUpdateJob", jobRepository)
+                .start(businessAttractionUpdateFlpopScoreStep)
+                .next(businessAttractionUpdateIncomeConsumptionScoreStep)
+                .next(businessAttractionUpdateIndexQuarterlyQuotientScoreStep)
+                .next(businessAttractionUpdateSellingScoreStep)
+                .next(businessAttractionUpdateResidentPopulationScoreStep)
+                .next(businessAttractionUpdateStoreScoreStep)
                 .build();
     }
 
