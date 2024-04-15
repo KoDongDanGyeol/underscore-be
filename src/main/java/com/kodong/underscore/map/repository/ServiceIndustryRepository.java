@@ -12,6 +12,5 @@ import java.util.Optional;
 public interface ServiceIndustryRepository extends JpaRepository<ServiceIndustry, Long> {
 
     Optional<ServiceIndustry> findByServiceIndustryCode(String serviceIndustryCode);
-    List<ServiceIndustry> findByServiceIndustryCodeContaining(String code, Sort sort
-    );
+    List<ServiceIndustry> findByServiceIndustryCodeContaining(String code, Sort sort);
 }
