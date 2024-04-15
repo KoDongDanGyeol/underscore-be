@@ -12,6 +12,13 @@ public enum DataConfig {
             "administrativeOrganizationCreationDate","administrativeOrganizationCancellationDate"
     }),
 
+    LegalDistrictData("LegalDistrictData.csv",new String[]{
+            "siDo", "siGunGu",
+            "administrativeDistrictName" ,"administrativeDong", "legalDong",
+            "administrativeClassification","administrativeCode", "administrativeOrganizationCreationDate",
+            "legalDistrictCode", "administrativeDistrictEnglishName"
+    }),
+
     ServiceIndustry("ServiceIndustryData.csv",new String[]{
             "serviceIndustryCode",
             "serviceIndustryCodeName"
