@@ -1,5 +1,6 @@
 package com.kodong.underscore.map.entity;
 
+import com.kodong.underscore.map.util.BusinessAttractionLabels;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -73,5 +74,25 @@ public class BusinessAttraction {
                 floatingPopulationScore + incomeConsumptionScore + residentPopulationScore
                 + indexQuarterlyQuotientScore + sellingScore + storeScore;
     }
+  
+    public int[] getScoresForLoggedInUser() {
+        BusinessAttractionLabels[] labels = BusinessAttractionLabels.values();
+        int[] scores = new int[labels.length];  // Exclude 'totalScore'
+        for (int i = 0; i < labels.length; i++) {
+            scores[i] = BusinessAttractionLabels.getScore(this, labels[i]);
+        }
+        return scores;
+    }
 
+    public int[] getScoresForGuestUser() {
+        BusinessAttractionLabels[] labels = BusinessAttractionLabels.values();
+        int[] scores = new int[labels.length];  // Exclude 'totalScore'
+        for (int i = 0; i < labels.length; i++) {
+            if(i>1){
+                break;
+            }
+            scores[i] = BusinessAttractionLabels.getScore(this, labels[i]);
+        }
+        return scores;
+    }
 }
