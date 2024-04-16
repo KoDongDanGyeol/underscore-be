@@ -74,7 +74,7 @@ public class BusinessAttraction {
                 floatingPopulationScore + incomeConsumptionScore + residentPopulationScore
                 + indexQuarterlyQuotientScore + sellingScore + storeScore;
     }
-
+  
     public int[] getScoresForLoggedInUser() {
         BusinessAttractionLabels[] labels = BusinessAttractionLabels.values();
         int[] scores = new int[labels.length];  // Exclude 'totalScore'
@@ -95,5 +95,4 @@ public class BusinessAttraction {
         }
         return scores;
     }
-
 }

@@ -1,5 +1,6 @@
 package com.kodong.underscore.map.service;
 
+
 import com.kodong.underscore.map.data.BusinessAttractionDTO;
 import com.kodong.underscore.map.data.BusinessAttractionRequestData;
 import com.kodong.underscore.map.data.BusinessAttractionResponseDTO;
@@ -28,6 +29,7 @@ public class ScoreApiService {
     private final SellingRepository sellingRepository;
     private final StoreRepository storeRepository;
     private final LegalDistrictRepository legalDistrictRepository;
+
 
     public Map<String, String> allServiceIndustryData(){
         Map<String,String> dtos = new LinkedHashMap<>();
@@ -85,6 +87,7 @@ public class ScoreApiService {
             data = storeRepository
                     .findAllByServiceIndustryAndStandardYearQuarterCodeOrderBySimilarIndustryStoreCount(serviceIndustry,globalData.getStandardYearQuarterCode());
             thresholds = new ArrayList<>();
+            
             if(data.isEmpty()){
                 log.info("현재 이 Store Data는 비어 있습니다. (코드 : "+serviceIndustry.getServiceIndustryCode()+", 연분기 코드 : "+globalData.getStandardYearQuarterCode());
                 continue;
@@ -98,6 +101,7 @@ public class ScoreApiService {
         }
         globalData.updateStoreThresholds(mapData);
     }
+
 
     /**
      * 인자로 넘어온 업종분야 별로 매출 점수 기준 수정
@@ -113,6 +117,7 @@ public class ScoreApiService {
                     .findAllByServiceIndustryAndStandardYearQuarterCodeOrderByThsmonSelngAmt(serviceIndustry,globalData.getStandardYearQuarterCode());
 
             thresholds = new ArrayList<>();
+
             if(data.isEmpty()){
                 log.info("현재 이 selling Data는 비어 있습니다. (코드 : "+serviceIndustry.getServiceIndustryCode()+", 연분기 코드 : "+globalData.getStandardYearQuarterCode());
                 continue;
@@ -366,5 +371,4 @@ public class ScoreApiService {
         }
         return false;
     }
-
 }

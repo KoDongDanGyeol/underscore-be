@@ -13,5 +13,4 @@ public interface LegalDistrictRepository extends JpaRepository<LegalDistrict, Lo
     // 법정동을 찾아서 행정동코드 넘겨주는 함수
     @Query("SELECT ld.administrativeCode FROM LegalDistrict ld WHERE ld.legalDistrictCode = :legalDistrictCode")
     Optional<String> findAdministrativeCodeByLegalDistrictCode(@Param("legalDistrictCode") String legalDistrictCode);
-
 }
