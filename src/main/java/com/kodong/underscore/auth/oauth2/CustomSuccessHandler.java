@@ -45,7 +45,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.setHeader("access", accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
         response.setStatus(HttpStatus.OK.value());
-        response.sendRedirect("https://localhost:3000/auth/join/complete");
+        response.sendRedirect("https://underscore.or.kr/auth/join/complete");
     }
 
     private Cookie createCookie(String key, String value) {
