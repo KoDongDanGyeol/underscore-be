@@ -45,7 +45,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // refresh token 저장
         saveRefreshToken(username, refreshToken, 86400000L);
 
-        log.info("token success..")
+        log.info("token success..");
 
         response.setHeader("access", accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
