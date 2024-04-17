@@ -39,8 +39,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = jwtUtil.createJwt("access", username, role, 600000L);
         String refreshToken = jwtUtil.createJwt("refresh", username, role, 86400000L);
 
+        log.info("accessToken: {}", accessToken);
+        log.info("refreshToken: {}", refreshToken);
+
         // refresh token 저장
         saveRefreshToken(username, refreshToken, 86400000L);
+
+        log.info("token success..")
 
         response.setHeader("access", accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
