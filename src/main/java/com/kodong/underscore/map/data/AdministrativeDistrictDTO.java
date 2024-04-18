@@ -6,23 +6,29 @@ import lombok.Data;
 @Data
 public class AdministrativeDistrictDTO {
 
-    // 행정기관 코드
-    private String administrativeCode;
-
     // 시,도
     private String siDo;
 
     // 시,군,구
     private String siGunGu;
 
-    // 읍,면,동
-    private String eupMyeonDong;
+    // 행정동
+    private String administrativeDong;
+
+    //행정구역 분류
+    private String administrativeClassification;
+
+    // 행정기관 코드
+    private String administrativeCode;
 
     // 행정기관 생성일
     private String administrativeOrganizationCreationDate;
 
-    // 행정기관 생성일
-    private String administrativeOrganizationCancellationDate;
+    // x 좌표, 경도
+    private double xLongitude;
+
+    // y 좌표, 위도
+    private double yLatitude;
 
     public AdministrativeDistrict convertToAdministrativeDistrict(AdministrativeDistrictDTO dto){
         return AdministrativeDistrict.builder()
