@@ -5,6 +5,7 @@ import com.kodong.underscore.map.data.AdministrativeDistrictDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -13,7 +14,6 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AdministrativeDistrict {
-
     @Id
     @GeneratedValue
     private Long id;
@@ -35,8 +35,6 @@ public class AdministrativeDistrict {
     // 행정기관 만료일
     private String administrativeOrganizationCancellationDate;
 
-
-
     @Builder
     public AdministrativeDistrict(AdministrativeDistrictDTO dto){
         this.siDo = dto.getSiDo();
@@ -46,5 +44,6 @@ public class AdministrativeDistrict {
         this.eupMyeonDong = dto.getEupMyeonDong();
         this.administrativeOrganizationCancellationDate = dto.getAdministrativeOrganizationCancellationDate();
     }
+
 
 }

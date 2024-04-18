@@ -1,11 +1,12 @@
 package com.kodong.underscore.auth.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.kodong.underscore.map.entity.AdministrativeDistrict;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter @NoArgsConstructor
@@ -19,6 +20,9 @@ public class User {
     private String email;
     private String role;
 
+    @OneToMany(mappedBy = "user")
+    private List<MyPlace> myPlaces = new ArrayList<>();
+
     public User(String username, String name, String email, String role) {
         this.username = username;
         this.name = name;
@@ -29,5 +33,10 @@ public class User {
     public void updateNameAndEmail(String name, String email) {
         this.name = name;
         this.email = email;
+    }
+
+    public void addMyPlace(MyPlace myPlace) {
+        myPlaces.add(myPlace);
+        myPlace.setUser(this);
     }
 }
