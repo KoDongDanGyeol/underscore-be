@@ -7,9 +7,14 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum DataConfig {
     DistrictData("AdministrativeDistrictData.csv",new String[]{
-            "administrativeCode",
-            "siDo", "siGunGu", "eupMyeonDong",
-            "administrativeOrganizationCreationDate","administrativeOrganizationCancellationDate"
+            "siDo", "siGunGu", "administrativeDong",
+            "administrativeClassification","administrativeCode",
+            "administrativeOrganizationCreationDate"
+    }),
+
+    DistrictAddressData("AdministrativeDistrictAddressData.csv",new String[]{
+            "id", "siDo", "siGunGu", "administrativeDong", "postNumber",
+            "address"
     }),
 
     LegalDistrictData("LegalDistrictData.csv",new String[]{
