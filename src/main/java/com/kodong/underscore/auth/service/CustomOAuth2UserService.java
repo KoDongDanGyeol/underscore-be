@@ -5,6 +5,7 @@ import com.kodong.underscore.auth.entity.User;
 import com.kodong.underscore.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -66,9 +67,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal().equals("anonymousUser"))
+            throw new RuntimeException("로그인 된 상태가 아닙니다.");
+
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
         String username = customUserDetails.getUsername();
-
         return userRepository.findByUsername(username);
     }
 

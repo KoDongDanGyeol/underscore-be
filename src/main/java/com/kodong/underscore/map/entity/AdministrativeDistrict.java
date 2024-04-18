@@ -6,13 +6,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AdministrativeDistrict {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,8 +41,6 @@ public class AdministrativeDistrict {
     // y 좌표, 위도
     private double yLatitude;
 
-
-
     @Builder
     public AdministrativeDistrict(AdministrativeDistrictDTO dto){
         this.siDo = dto.getSiDo();
@@ -55,6 +53,7 @@ public class AdministrativeDistrict {
         this.yLatitude = dto.getYLatitude();
     }
 
+
     public double updateLongitude(double longitude){
         this.xLongitude = longitude;
         return longitude;
@@ -64,4 +63,5 @@ public class AdministrativeDistrict {
         this.yLatitude = latitude;
         return latitude;
     }
+
 }
