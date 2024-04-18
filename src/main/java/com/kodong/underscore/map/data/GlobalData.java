@@ -47,6 +47,10 @@ public class GlobalData {
         return Collections.unmodifiableList(indexQuarterlyQuotientThresholds);
     }
 
+    public String getTokenForSGIS() {
+        return tokenForSGIS;
+    }
+
     public String getStandardYearQuarterCode() {
         return standardYearQuarterCode;
     }

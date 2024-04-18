@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface AdministrativeDistrictRepository extends JpaRepository<AdministrativeDistrict, Long> {
     Optional<AdministrativeDistrict> findByAdministrativeCode(String administrativeCode);
+    Optional<AdministrativeDistrict> findByAdministrativeClassification(String administrativeClassification);
 
 }

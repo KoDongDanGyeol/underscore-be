@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Selling {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

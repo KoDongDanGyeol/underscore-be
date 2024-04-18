@@ -4,21 +4,18 @@ package com.kodong.underscore.map.entity;
 import com.kodong.underscore.map.data.AdministrativeDistrictDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.*;
-
-import java.time.LocalDate;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AdministrativeDistrict {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // 행정기관 코드
-    private String administrativeCode;
 
     // 시,도
     private String siDo;
@@ -26,24 +23,45 @@ public class AdministrativeDistrict {
     // 시,군,구
     private String siGunGu;
 
-    // 읍,면,동
-    private String eupMyeonDong;
+    // 행정동
+    private String administrativeDong;
+
+    //행정구역 분류
+    private String administrativeClassification;
+
+    // 행정기관 코드
+    private String administrativeCode;
 
     // 행정기관 생성일
     private String administrativeOrganizationCreationDate;
 
-    // 행정기관 만료일
-    private String administrativeOrganizationCancellationDate;
+    // x 좌표, 경도
+    private double xLongitude;
+
+    // y 좌표, 위도
+    private double yLatitude;
 
     @Builder
     public AdministrativeDistrict(AdministrativeDistrictDTO dto){
         this.siDo = dto.getSiDo();
         this.siGunGu = dto.getSiGunGu();
+        this.administrativeDong = dto.getAdministrativeDong();
+        this.administrativeClassification = dto.getAdministrativeClassification();
         this.administrativeCode = dto.getAdministrativeCode();
         this.administrativeOrganizationCreationDate = dto.getAdministrativeOrganizationCreationDate();
-        this.eupMyeonDong = dto.getEupMyeonDong();
-        this.administrativeOrganizationCancellationDate = dto.getAdministrativeOrganizationCancellationDate();
+        this.xLongitude = dto.getXLongitude();
+        this.yLatitude = dto.getYLatitude();
     }
 
+
+    public double updateLongitude(double longitude){
+        this.xLongitude = longitude;
+        return longitude;
+    }
+
+    public double updateLatitude(double latitude){
+        this.yLatitude = latitude;
+        return latitude;
+    }
 
 }
