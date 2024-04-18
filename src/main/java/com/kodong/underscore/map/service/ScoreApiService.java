@@ -237,7 +237,7 @@ public class ScoreApiService {
 
         return BusinessAttractionDTO.builder()
                 .legalDistrictCode(legalDistrictCode)
-                .administrativeDistrictName(administrativeDistrict.getEupMyeonDong())
+                .administrativeDistrictName(administrativeDistrict.getAdministrativeDong())
                 .businessAttractionScores(attraction.getScoresForLoggedInUser())
                 .totalScore(attraction.getTotalScore())
                 .build();
@@ -310,7 +310,7 @@ public class ScoreApiService {
 
         return BusinessAttractionDTO.builder()
                 .legalDistrictCode(legalDistrictCode)
-                .administrativeDistrictName(administrativeDistrict.getEupMyeonDong())
+                .administrativeDistrictName(administrativeDistrict.getAdministrativeDong())
                 .businessAttractionScores(scores)
                 .totalScore(sum)
                 .build();
