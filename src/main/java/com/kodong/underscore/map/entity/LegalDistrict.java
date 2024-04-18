@@ -3,6 +3,7 @@ package com.kodong.underscore.map.entity;
 import com.kodong.underscore.map.data.LegalDistrictDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import lombok.*;
 public class LegalDistrict {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     // 시,도
