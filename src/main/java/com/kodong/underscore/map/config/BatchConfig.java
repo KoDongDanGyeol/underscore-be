@@ -29,17 +29,18 @@ public class BatchConfig {
 
     @Bean
     public Job processDataInsertJob(JobRepository jobRepository,
-                                    Step administrativeDistrictStep, Step serviceIndustryStep, Step legalDistrictStep,
+                                    Step administrativeDistrictStep, Step serviceIndustryStep,
                                     Step storeStep, Step floatingPopulationStep, Step incomeConsumptionStep,
-                                    Step indexQuarterlyQuotientStep, Step residentPopulationStep, Step sellingStep, SequentialJobListener sequentialJobListener) {
+                                    Step indexQuarterlyQuotientStep, Step residentPopulationStep, Step sellingStep, SequentialJobListener sequentialJobListener,
+                                    Step administrativeDistrictLocationUpdateStep) {
 
 
         // 먼저 실행할 Step의 Flow를 정의
         Flow dataInputFlow = new FlowBuilder<Flow>("dataInut")
                 .split(taskExecutor())
                 .add(new FlowBuilder<Flow>("administrativeDongFlow").start(administrativeDistrictStep).end(),
-                        new FlowBuilder<Flow>("serviceIndustryFlow").start(serviceIndustryStep).end(),
-                        new FlowBuilder<Flow>("legalDongFlow").start(legalDistrictStep).end())
+                        new FlowBuilder<Flow>("serviceIndustryFlow").start(serviceIndustryStep).end())
+                       //new FlowBuilder<Flow>("legalDongFlow").start(legalDistrictStep).end())
                 .build();
 
         Flow parallelSteps = new FlowBuilder<Flow>("parallelSteps")
@@ -62,6 +63,7 @@ public class BatchConfig {
         return new JobBuilder("processDataInsertJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(jobFlow)
+                .next(administrativeDistrictLocationUpdateStep)
                 .end()// storeStep은 Stor 처리 관련 Step
                 .listener(sequentialJobListener)
                 .build();
@@ -90,6 +92,14 @@ public class BatchConfig {
                 .next(businessAttractionUpdateSellingScoreStep)
                 .next(businessAttractionUpdateResidentPopulationScoreStep)
                 .next(businessAttractionUpdateStoreScoreStep)
+                .build();
+    }
+
+    @Bean
+    public Job administrativeLocationPutJob(JobRepository jobRepository, Step administrativeDistrictLocationUpdateStep) {
+        return new JobBuilder("administrativeLocationPutJob",jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(administrativeDistrictLocationUpdateStep)
                 .build();
     }
 
