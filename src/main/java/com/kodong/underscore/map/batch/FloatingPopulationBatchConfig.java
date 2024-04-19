@@ -107,12 +107,13 @@ public class FloatingPopulationBatchConfig {
 
     @Bean
     public RepositoryItemReader<FloatingPopulation> floatingPopulationItemReader(
-            FloatingPopulationRepository repository) {
+            FloatingPopulationRepository repository, GlobalData globalData) {
 
         // RepositoryItemReader 설정
         RepositoryItemReader<FloatingPopulation> reader = new RepositoryItemReader<>();
         reader.setRepository(repository);
-        reader.setMethodName("findAll");
+        reader.setMethodName("findByStandardYearQuarterCode");
+        reader.setArguments(globalData.getStandardYearQuarterCodeAsList());
         reader.setPageSize(100); // 페이지 크기 설정
         reader.setSort(Collections.singletonMap("id", Sort.Direction.ASC)); // 정렬 기준 설정
 

@@ -35,16 +35,28 @@ public class SequentialJobListener implements JobExecutionListener {
                 // 첫 번째 작업이 완료되면, 서비스 업데이트와 두 번째 작업 실행
                 if (jobExecution.getJobInstance().getJobName().equals("processDataInsertJob")) {
                     log.info("BUSINESSATTRACTION INIT JOB started");
-                    scoreApiService.insertServiceIndustryData();
+                    scoreApiService.putAllServiceIndustryDataInGlobalData();
                     runJob(secondJob, jobExecution.getJobParameters());
                 }
                 // 두 번째 작업이 완료되면, 추가 서비스 메서드 호출 후 세 번째 작업 실행
                 if (jobExecution.getJobInstance().getJobName().equals("businessAttractionInitJob")) {
                     log.info("BUSINESSATTRACTION UPDATE JOB started");
-                    scoreApiService.allServiceIndustryData();
                     scoreApiService.updateThresholds();
                     runJob(thirdJob, jobExecution.getJobParameters());
                 }
+                // 일시적으로 Store 값 넣는 부분 추가했을 때 필요한 로직
+                if (jobExecution.getJobInstance().getJobName().equals("businessAttractionInitJob")) {
+                    log.info("BUSINESSATTRACTION UPDATE JOB started");
+                    scoreApiService.updateThresholds();
+                    runJob(thirdJob, jobExecution.getJobParameters());
+                }
+
+                if (jobExecution.getJobInstance().getJobName().equals("temporaryStoreDataInputJob")) {
+                    log.info("BUSINESSATTRACTION UPDATE JOB started");
+                    scoreApiService.updateThresholds();
+                    runJob(thirdJob, jobExecution.getJobParameters());
+                }
+
             } catch (Exception e) {
                 System.out.println("Error during job execution: " + e.getMessage());
             }
