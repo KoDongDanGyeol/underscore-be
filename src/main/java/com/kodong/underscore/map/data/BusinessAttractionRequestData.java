@@ -10,6 +10,8 @@ import java.util.List;
 @Data
 public class BusinessAttractionRequestData {
 
+    private Long administrativeDistrictId;
+
     private double minXLongitude;
 
     private double maxXLongitude;
