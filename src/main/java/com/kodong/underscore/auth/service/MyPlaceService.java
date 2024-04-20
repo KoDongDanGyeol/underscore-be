@@ -61,7 +61,7 @@ public class MyPlaceService {
         MyPlaceDto myPlaceDto = new MyPlaceDto();
         myPlaceDto.setSiDo(myPlace.getAdministrativeDistrict().getSiDo());
         myPlaceDto.setSiGunGu(myPlace.getAdministrativeDistrict().getSiGunGu());
-        myPlaceDto.setEupMyeonDong(myPlace.getAdministrativeDistrict().getEupMyeonDong());
+        myPlaceDto.setEupMyeonDong(myPlace.getAdministrativeDistrict().getAdministrativeDong());
         return myPlaceDto;
     }
 }
