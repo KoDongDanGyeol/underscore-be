@@ -26,7 +26,6 @@ public class BatchJobController {
     private final Job businessAttractionInitJob;
     private final AdministrativeDistrictRepository administrativeDistrictRepository;
     private final Job businessAttractionUpdateJob;
-    private final Job temporaryStoreDadtaInputJob;
 
 
     public BatchJobController(JobLauncher jobLauncher,
@@ -34,7 +33,6 @@ public class BatchJobController {
                               @Qualifier("administrativeLocationPutJob") Job administrativeLocationPutJob,
                               @Qualifier("businessAttractionInitJob") Job businessAttractionInitJob,
                               @Qualifier("businessAttractionUpdateJob") Job businessAttractionUpdateJob,
-                              @Qualifier("temporaryStoreDadtaInputJob") Job temporaryStoreDadtaInputJob,
                               ScoreApiService scoreApiService, AdministrativeDistrictLocationMaker administrativeDistrictLocationMaker, AdministrativeDistrictRepository administrativeDistrictRepository) {
         this.jobLauncher = jobLauncher;
         this.processDataInsertJob = processDataInsertJob;
@@ -44,8 +42,6 @@ public class BatchJobController {
         this.businessAttractionInitJob = businessAttractionInitJob;
         this.administrativeDistrictRepository = administrativeDistrictRepository;
         this.businessAttractionUpdateJob = businessAttractionUpdateJob;
-        this.temporaryStoreDadtaInputJob =temporaryStoreDadtaInputJob;
-
     }
 
     @GetMapping("/run-batch-job")
@@ -57,18 +53,6 @@ public class BatchJobController {
         administrativeDistrictLocationMaker.refreshSGISAccessToken();
         log.info("ProcessDATAINSERTJOB started");
         jobLauncher.run(processDataInsertJob, jobParameters);
-        return "Batch job has been invoked";
-    }
-
-    @GetMapping("/adjob")
-    public String runDupJob() throws Exception {
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addLong("time", System.currentTimeMillis())
-                .toJobParameters();
-
-        scoreApiService.putAllServiceIndustryDataInGlobalData();
-        jobLauncher.run(temporaryStoreDadtaInputJob, jobParameters);
-
         return "Batch job has been invoked";
     }
 }
