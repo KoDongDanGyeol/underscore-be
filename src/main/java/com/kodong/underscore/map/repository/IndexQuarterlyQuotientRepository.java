@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface IndexQuarterlyQuotientRepository extends JpaRepository<IndexQuarterlyQuotient,Long> {
     Page<IndexQuarterlyQuotient> findAll(Pageable pageable);
     Optional<IndexQuarterlyQuotient> findByStandardYearQuarterCodeAndAdministrativeDistrict(String standardYearQuarterCode, AdministrativeDistrict district);
+    Page<IndexQuarterlyQuotient> findByStandardYearQuarterCode(String standardYearQuarterCode, Pageable pageable);
 }

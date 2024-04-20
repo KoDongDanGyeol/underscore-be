@@ -1,10 +1,7 @@
 package com.kodong.underscore.map.service;
 
 
-import com.kodong.underscore.map.data.BusinessAttractionDTO;
-import com.kodong.underscore.map.data.BusinessAttractionRequestData;
-import com.kodong.underscore.map.data.BusinessAttractionResponseDTO;
-import com.kodong.underscore.map.data.GlobalData;
+import com.kodong.underscore.map.data.*;
 import com.kodong.underscore.map.entity.*;
 import com.kodong.underscore.map.repository.*;
 import com.kodong.underscore.map.util.BusinessAttractionLabels;
@@ -39,6 +36,10 @@ public class ScoreApiService {
             dtos.put(data.getServiceIndustryCode(),data.getServiceIndustryCodeName());
         }
         return dtos;
+    }
+
+    public void putAllServiceIndustryDataInGlobalData(){
+        globalData.updateServiceIndustryList(serviceIndustryRepository.findAll());
     }
 
     public void insertServiceIndustryData(){
@@ -192,19 +193,19 @@ public class ScoreApiService {
      */
     public BusinessAttractionResponseDTO getBusinessAttractionsForLoggedInUser(BusinessAttractionRequestData requestData) {
         putFoodDataIntoGlobalData();
-        boolean containsInserviceableArea = checkContainsInserviceableArea(requestData.getLegalDistrictCode());
-        checkTooMuchLegalDistrict(requestData.getLegalDistrictCode());
+        List<AdministrativeDistrict> administrativeDistrictsInRange = getAdministrativeDistrictInRange(requestData);
+        checkTooMuchAdministrativeDistrict(administrativeDistrictsInRange);
+        boolean containsInserviceableArea = checkContainsInserviceableArea(administrativeDistrictsInRange);
         String[] labels = BusinessAttractionLabels.getLabels();
-        validateServiceIndustry(requestData.getServiceIndustryCode());
-        String serviceIndustryCode = requestData.getServiceIndustryCode();
+        String serviceIndustryCode = validateServiceIndustry(requestData.getServiceIndustryCode());
 
         ServiceIndustry serviceIndustry =serviceIndustryRepository.findByServiceIndustryCode(serviceIndustryCode).orElseThrow();
-        List<String> legalDistrictCodesInSeoul = getServiceAreaLegalCodes(requestData.getLegalDistrictCode());
+        List<AdministrativeDistrict> administrativeDistrictsInSeoul = getAdministrativeDistrictsInServiceArea(administrativeDistrictsInRange);
 
         List<BusinessAttractionDTO> businessAttractionDTOS = new ArrayList<>();
         BusinessAttractionDTO businessAttractionDTO;
-        for(String legalDistrictCode : legalDistrictCodesInSeoul){
-            businessAttractionDTO = makeBusinessAttractionDTOForLoggedInUser(serviceIndustry, legalDistrictCode);
+        for(AdministrativeDistrict district : administrativeDistrictsInSeoul){
+            businessAttractionDTO = makeBusinessAttractionDTOForLoggedInUser(serviceIndustry, district);
             businessAttractionDTOS.add(businessAttractionDTO);
         }
 
@@ -217,15 +218,13 @@ public class ScoreApiService {
     }
 
     /**
-     * 업종분야 코드와 법정동 코드를 받아서 적절하게 처리후 개업 매력도 DTO 생성
-     * @param serviceIndustry
-     * @param legalDistrictCode
-     * @return 개업 매력도 DTO
+     * 업종분야 객체와 행정동 객체를 받아서 적절하게 처리후 개업 매력도 DTO 생성
+     * 전체 개업 매력도 점수를 모두 다 포함
+     * @param serviceIndustry 업종분야 객체
+     * @param administrativeDistrict 행정동 객체
+     * @return 개업매력도 DTO
      */
-    private BusinessAttractionDTO makeBusinessAttractionDTOForLoggedInUser(ServiceIndustry serviceIndustry, String legalDistrictCode) {
-
-        String administrativeCode = legalDistrictRepository.findAdministrativeCodeByLegalDistrictCode(legalDistrictCode).orElseThrow();
-        AdministrativeDistrict administrativeDistrict = administrativeDistrictRepository.findByAdministrativeCode(administrativeCode).orElseThrow();
+    private BusinessAttractionDTO makeBusinessAttractionDTOForLoggedInUser(ServiceIndustry serviceIndustry, AdministrativeDistrict administrativeDistrict) {
 
         BusinessAttractionId id = BusinessAttractionId.builder()
                 .serviceIndustryId(serviceIndustry)
@@ -236,10 +235,12 @@ public class ScoreApiService {
         BusinessAttraction attraction = businessAttractionRepository.findById(id).orElseThrow();
 
         return BusinessAttractionDTO.builder()
-                .legalDistrictCode(legalDistrictCode)
-                .administrativeDistrictName(administrativeDistrict.getAdministrativeDong())
+                .id(administrativeDistrict.getId())
+                .administrativeDistrictName(administrativeDistrict.getFullAddress())
                 .businessAttractionScores(attraction.getScoresForLoggedInUser())
                 .totalScore(attraction.getTotalScore())
+                .xLongitude(administrativeDistrict.getXLongitude())
+                .yLatitude(administrativeDistrict.getYLatitude())
                 .build();
     }
 
@@ -252,19 +253,20 @@ public class ScoreApiService {
      */
     public BusinessAttractionResponseDTO getBusinessAttractionsForGuestUser(BusinessAttractionRequestData requestData) {
         putFoodDataIntoGlobalData();
-        boolean containsInserviceableArea = checkContainsInserviceableArea(requestData.getLegalDistrictCode());
-        checkTooMuchLegalDistrict(requestData.getLegalDistrictCode());
+        List<AdministrativeDistrict> administrativeDistrictsInRange = getAdministrativeDistrictInRange(requestData);
+        checkTooMuchAdministrativeDistrict(administrativeDistrictsInRange);
+        boolean containsInserviceableArea = checkContainsInserviceableArea(administrativeDistrictsInRange);
         String[] labels = BusinessAttractionLabels.getLabels();
-        validateServiceIndustry(requestData.getServiceIndustryCode());
-        String serviceIndustryCode = requestData.getServiceIndustryCode();
+        String serviceIndustryCode = validateServiceIndustry(requestData.getServiceIndustryCode());
+
 
         ServiceIndustry serviceIndustry =serviceIndustryRepository.findByServiceIndustryCode(serviceIndustryCode).orElseThrow();
-        List<String> legalDistrictCodesInSeoul = getServiceAreaLegalCodes(requestData.getLegalDistrictCode());
+        List<AdministrativeDistrict> administrativeDistrictsInSeoul = getAdministrativeDistrictsInServiceArea(administrativeDistrictsInRange);
 
         List<BusinessAttractionDTO> businessAttractionDTOS = new ArrayList<>();
         BusinessAttractionDTO businessAttractionDTO;
-        for(String legalDistrictCode : legalDistrictCodesInSeoul){
-            businessAttractionDTO = makeBusinessAttractionDTOForGuestUser(serviceIndustry, legalDistrictCode);
+        for(AdministrativeDistrict district : administrativeDistrictsInSeoul){
+            businessAttractionDTO = makeBusinessAttractionDTOForGuestUser(serviceIndustry, district);
             businessAttractionDTOS.add(businessAttractionDTO);
         }
 
@@ -279,24 +281,22 @@ public class ScoreApiService {
 
     /**
      * 20개 이상의 개업 매력도 표시해야 하면 에러처리
-     * @param legalDistrictCode
+     * @param districts
      */
-    private void checkTooMuchLegalDistrict(List<String> legalDistrictCode) {
-        if(legalDistrictCode.size() > 20){
+    private void checkTooMuchAdministrativeDistrict(List<AdministrativeDistrict> districts) {
+        if(districts.size() > 20){
             // TODO 20개가 넘는 개업 매력도를 표현해야 하는 경우 에러 발생
         }
     }
 
     /**
-     * 업종분야 코드와 법정동 코드를 받아서 적절하게 처리후 개업 매력도 DTO 생성
-     * @param serviceIndustry
-     * @param legalDistrictCode
-     * @return 개업 매력도 DTO
+     * 업종분야 객체와 행정동 객체를 받아서 적절하게 처리후 개업 매력도 DTO 생성
+     * 일부 매력도 점수를 모두 다 포함
+     * @param serviceIndustry 업종분야 객체
+     * @param administrativeDistrict 행정동 객체
+     * @return 개업매력도 DTO
      */
-    private BusinessAttractionDTO makeBusinessAttractionDTOForGuestUser(ServiceIndustry serviceIndustry, String legalDistrictCode) {
-
-        String administrativeCode = legalDistrictRepository.findAdministrativeCodeByLegalDistrictCode(legalDistrictCode).orElseThrow();
-        AdministrativeDistrict administrativeDistrict = administrativeDistrictRepository.findByAdministrativeCode(administrativeCode).orElseThrow();
+    private BusinessAttractionDTO makeBusinessAttractionDTOForGuestUser(ServiceIndustry serviceIndustry, AdministrativeDistrict administrativeDistrict) {
 
         BusinessAttractionId id = BusinessAttractionId.builder()
                 .serviceIndustryId(serviceIndustry)
@@ -309,10 +309,12 @@ public class ScoreApiService {
         int sum = Arrays.stream(scores).sum();
 
         return BusinessAttractionDTO.builder()
-                .legalDistrictCode(legalDistrictCode)
-                .administrativeDistrictName(administrativeDistrict.getAdministrativeDong())
+                .id(administrativeDistrict.getId())
+                .administrativeDistrictName(administrativeDistrict.getFullAddress())
                 .businessAttractionScores(scores)
                 .totalScore(sum)
+                .xLongitude(administrativeDistrict.getXLongitude())
+                .yLatitude(administrativeDistrict.getYLatitude())
                 .build();
     }
 
@@ -322,7 +324,7 @@ public class ScoreApiService {
      * DB에 없는 문자열이 넘어올 경우 에러처리
      * @param serviceIndustryCode
      */
-    private void validateServiceIndustry(String serviceIndustryCode) {
+    private String validateServiceIndustry(String serviceIndustryCode) {
         if(serviceIndustryCode == null || serviceIndustryCode.isEmpty()){
             //TODO 업종분야 코드가 제대로 안넘어온 경우 에러처리
         }
@@ -338,37 +340,48 @@ public class ScoreApiService {
         if(!hasMatchingServiceIndustry){
             // TODO 업종분야 코드가 매칭되는게 없는 경우 에러처리
         }
+
+        return serviceIndustryCode;
     }
 
-    /**
-     * 서비스 제공 지역의 법정동 코드만 남기도록 제거
-     * 이건 굳이 HashSet이 아니라 List로 해도 좋을 듯
-     * @param legalDistrictCode
-     * @return 서비스 제공 지역의 법정동 코드가 담긴 Set
-     */
-    private List<String> getServiceAreaLegalCodes(List<String> legalDistrictCode) {
-        List<String> legalDistrictCodes = new ArrayList<>();
-        for(String code : legalDistrictCode){
-            if(!code.startsWith("11")){
+
+    private List<AdministrativeDistrict> getAdministrativeDistrictsInServiceArea(List<AdministrativeDistrict> districts) {
+        List<AdministrativeDistrict> districtsInServiceArea = new ArrayList<>();
+        for(AdministrativeDistrict district : districts){
+            if(!district.getAdministrativeCode().startsWith("11")){
                 continue;
             }
-            legalDistrictCodes.add(code);
+            districtsInServiceArea.add(district);
         }
 
-        return legalDistrictCodes;
+        return districtsInServiceArea;
     }
 
     /**
      * 서비스 불가 지역을 포함하고 있는지 확인하는 함수
-     * @param legalDistrictCode
+     * @param districts 필요 범위 내의 행정동들이 담기 리스트
      * @return 서비스 불가 지역 포함여부
      */
-    private boolean checkContainsInserviceableArea(List<String> legalDistrictCode) {
-        for(String code : legalDistrictCode){
-            if(!code.startsWith("11")){
+    private boolean checkContainsInserviceableArea(List<AdministrativeDistrict> districts) {
+        for(AdministrativeDistrict district : districts){
+            if(!district.getAdministrativeCode().startsWith("11")){
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * 클라이언트로부터 지도의 범위를 받았을 때 그 범위 내에 포함된 행정동 list 반환
+     * @param requestData 지도의 범위가 담긴 DTO
+     * @return 범위 내에 포함된 행정동 List
+     */
+    private List<AdministrativeDistrict> getAdministrativeDistrictInRange(BusinessAttractionRequestData requestData) {
+        return administrativeDistrictRepository.findByXLongitudeBetweenAndYLatitudeBetween(
+                requestData.getMinXLongitude(),
+                requestData.getMaxXLongitude(),
+                requestData.getMinYLatitude(),
+                requestData.getMaxYLatitude()
+        );
     }
 }

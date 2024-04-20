@@ -55,6 +55,10 @@ public class GlobalData {
         return standardYearQuarterCode;
     }
 
+    public List<String> getStandardYearQuarterCodeAsList(){
+        return Collections.singletonList(standardYearQuarterCode);
+    }
+
     public void updateServiceIndustryList(List<ServiceIndustry> serviceIndustries) {
         this.serviceIndustryList.clear();
         this.serviceIndustryList.addAll(serviceIndustries);

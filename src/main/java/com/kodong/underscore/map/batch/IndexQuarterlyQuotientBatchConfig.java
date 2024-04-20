@@ -109,12 +109,13 @@ public class IndexQuarterlyQuotientBatchConfig {
 
     @Bean
     public RepositoryItemReader<IndexQuarterlyQuotient> indexQuarterlyQuotientItemReader(
-            IndexQuarterlyQuotientRepository repository) {
+            IndexQuarterlyQuotientRepository repository, GlobalData globalData) {
 
         // RepositoryItemReader 설정
         RepositoryItemReader<IndexQuarterlyQuotient> reader = new RepositoryItemReader<>();
         reader.setRepository(repository);
-        reader.setMethodName("findAll");
+        reader.setMethodName("findByStandardYearQuarterCode");
+        reader.setArguments(globalData.getStandardYearQuarterCodeAsList());
         reader.setPageSize(100); // 페이지 크기 설정
         reader.setSort(Collections.singletonMap("id", Sort.Direction.ASC)); // 정렬 기준 설정
 

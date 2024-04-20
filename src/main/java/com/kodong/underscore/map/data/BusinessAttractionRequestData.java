@@ -9,7 +9,17 @@ import java.util.List;
  */
 @Data
 public class BusinessAttractionRequestData {
-    private List<String> legalDistrictCode;
+
+    private Long administrativeDistrictId;
+
+    private double minXLongitude;
+
+    private double maxXLongitude;
+
+    private double minYLatitude;
+
+    private double maxYLatitude;
+
     private String serviceIndustryCode;
 
 

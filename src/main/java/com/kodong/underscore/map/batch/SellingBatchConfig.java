@@ -88,6 +88,10 @@ public class SellingBatchConfig {
 
             // 행정동 변경이 csv에 적용이 안되어 있을 경우를 대비해 변경확인 후 변경 적용하는 부분
             Selng checkedSelng = dataCheck.updateSelng(selng);
+            if(checkedSelng.getAdstrdCode().equals("1126062000")||checkedSelng.getAdstrdCode().equals("1126061000")){
+                log.info("AdministrativeCode : {}    AdministrativeName : {} ServiceIndustryCode : {}    ServiceIndustryName : {}"
+                        ,checkedSelng.getAdstrdCode(),checkedSelng.getAdstrdCodeName(),checkedSelng.getServiceIndustryCode(),checkedSelng.getServiceIndustryCodeName());
+            }
             AdministrativeDistrict dong = administrativeDistrictRepository
                     .findByAdministrativeCode(checkedSelng.getAdstrdCode())
                     .orElse(null);
@@ -113,12 +117,13 @@ public class SellingBatchConfig {
 
     @Bean
     public RepositoryItemReader<Selling> sellingItemReader(
-            SellingRepository repository) {
+            SellingRepository repository, GlobalData globalData) {
 
         // RepositoryItemReader 설정
         RepositoryItemReader<Selling> reader = new RepositoryItemReader<>();
         reader.setRepository(repository);
-        reader.setMethodName("findAll");
+        reader.setMethodName("findByStandardYearQuarterCode");
+        reader.setArguments(globalData.getStandardYearQuarterCodeAsList());
         reader.setPageSize(100); // 페이지 크기 설정
         reader.setSort(Collections.singletonMap("id", Sort.Direction.ASC)); // 정렬 기준 설정
 

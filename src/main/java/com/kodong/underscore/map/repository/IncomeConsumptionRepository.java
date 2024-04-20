@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface IncomeConsumptionRepository extends JpaRepository<IncomeConsumption,Long> {
     List<IncomeConsumption> findAllByStandardYearQuarterCodeOrderByFoodExpenditureAmountAsc(String standardYearQuarterCode);
     Page<IncomeConsumption> findAll(Pageable pageable);
+    Page<IncomeConsumption> findByStandardYearQuarterCode(String standardYearQuarterCode, Pageable pageable);
 
     Optional<IncomeConsumption> findByStandardYearQuarterCodeAndAdministrativeDistrict(String standardYearQuarterCode, AdministrativeDistrict district);
 }

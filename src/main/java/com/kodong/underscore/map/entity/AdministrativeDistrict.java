@@ -53,6 +53,11 @@ public class AdministrativeDistrict {
         this.yLatitude = dto.getYLatitude();
     }
 
+    public String getFullAddress(){
+        return siDo + " " +
+                siGunGu + " " +
+                administrativeDong;
+    }
 
     public double updateLongitude(double longitude){
         this.xLongitude = longitude;
