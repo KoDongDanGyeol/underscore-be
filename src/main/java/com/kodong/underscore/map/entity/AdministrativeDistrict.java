@@ -41,10 +41,6 @@ public class AdministrativeDistrict {
     // y 좌표, 위도
     private double yLatitude;
 
-
-    // y 좌표, 위도
-    private double yLatitude;
-
     @Builder
     public AdministrativeDistrict(AdministrativeDistrictDTO dto){
         this.siDo = dto.getSiDo();
