@@ -67,7 +67,6 @@ public class ReissueService {
         String newRefreshToken = jwtUtil.createJwt("refresh", username, role, 86400000L);
         refreshTokenRepository.deleteByToken(refreshToken);
         addRefreshToken(username, refreshToken, 86400000L);
-        log.info("새로운 리프레쉬 토큰 저장: {}", refreshToken);
 
         // response
         response.setHeader("access", newAccessToken);

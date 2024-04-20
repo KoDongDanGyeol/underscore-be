@@ -18,4 +18,6 @@ public interface SellingRepository extends JpaRepository<Selling,Long> {
     Optional<Selling> findByStandardYearQuarterCodeAndAdministrativeDistrictAndServiceIndustry(
             String standardYearQuarterCode, AdministrativeDistrict administrativeDistrict, ServiceIndustry serviceIndustry
     );
+
+    Page<Selling> findByStandardYearQuarterCode(String standardYearQuarterCode, Pageable pageable);
 }

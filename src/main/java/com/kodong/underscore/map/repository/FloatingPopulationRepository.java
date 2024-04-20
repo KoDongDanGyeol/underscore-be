@@ -15,5 +15,6 @@ public interface FloatingPopulationRepository extends JpaRepository<FloatingPopu
     List<FloatingPopulation> findAllByStandardYearQuarterCodeOrderByTotFlpopCoAsc(String standardYearQuarterCode);
     Page<FloatingPopulation> findAll(Pageable pageable);
     Optional<FloatingPopulation> findByStandardYearQuarterCodeAndAdministrativeDistrict(String standardYearQuarterCode, AdministrativeDistrict administrativeDistrictCode);
+    Page<FloatingPopulation> findByStandardYearQuarterCode(String standardYearQuarterCode, Pageable pageable);
 
 }

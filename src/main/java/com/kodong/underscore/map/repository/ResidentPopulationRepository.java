@@ -15,4 +15,5 @@ public interface ResidentPopulationRepository extends JpaRepository<ResidentPopu
     List<ResidentPopulation> findAllByStandardYearQuarterCodeOrderByTotalRepopCountAsc(String standardYearQuarterCode);
     Page<ResidentPopulation> findAll(Pageable pageable);
     Optional<ResidentPopulation> findByStandardYearQuarterCodeAndAdministrativeDistrict(String standardYearQuarterCode, AdministrativeDistrict district);
+    Page<ResidentPopulation> findByStandardYearQuarterCode(String standardYearQuarterCode, Pageable pageable);
 }
