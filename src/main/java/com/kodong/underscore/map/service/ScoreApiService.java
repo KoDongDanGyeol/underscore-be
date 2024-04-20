@@ -235,6 +235,7 @@ public class ScoreApiService {
         BusinessAttraction attraction = businessAttractionRepository.findById(id).orElseThrow();
 
         return BusinessAttractionDTO.builder()
+                .id(administrativeDistrict.getId())
                 .administrativeDistrictName(administrativeDistrict.getFullAddress())
                 .businessAttractionScores(attraction.getScoresForLoggedInUser())
                 .totalScore(attraction.getTotalScore())
@@ -308,6 +309,7 @@ public class ScoreApiService {
         int sum = Arrays.stream(scores).sum();
 
         return BusinessAttractionDTO.builder()
+                .id(administrativeDistrict.getId())
                 .administrativeDistrictName(administrativeDistrict.getFullAddress())
                 .businessAttractionScores(scores)
                 .totalScore(sum)
