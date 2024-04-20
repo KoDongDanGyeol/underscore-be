@@ -28,6 +28,7 @@ public class BatchJobController {
     private final Job businessAttractionUpdateJob;
     private final Job temporaryStoreDadtaInputJob;
 
+
     public BatchJobController(JobLauncher jobLauncher,
                               @Qualifier("processDataInsertJob") Job processDataInsertJob,
                               @Qualifier("administrativeLocationPutJob") Job administrativeLocationPutJob,
@@ -44,6 +45,7 @@ public class BatchJobController {
         this.administrativeDistrictRepository = administrativeDistrictRepository;
         this.businessAttractionUpdateJob = businessAttractionUpdateJob;
         this.temporaryStoreDadtaInputJob =temporaryStoreDadtaInputJob;
+
     }
 
     @GetMapping("/run-batch-job")
@@ -66,6 +68,7 @@ public class BatchJobController {
 
         scoreApiService.putAllServiceIndustryDataInGlobalData();
         jobLauncher.run(temporaryStoreDadtaInputJob, jobParameters);
+
         return "Batch job has been invoked";
     }
 }

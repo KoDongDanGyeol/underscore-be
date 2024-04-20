@@ -102,13 +102,4 @@ public class BatchConfig {
                 .start(administrativeDistrictLocationUpdateStep)
                 .build();
     }
-
-    // 일시적인 job으로 추후 삭제 예정
-    @Bean
-    public Job temporaryStoreDadtaInputJob(JobRepository jobRepository, Step storeStep, SequentialJobListener sequentialJobListener){
-        return new JobBuilder("temporaryStoreDataInputJob",jobRepository)
-                .start(storeStep)
-                .listener(sequentialJobListener)
-                .build();
-    }
 }

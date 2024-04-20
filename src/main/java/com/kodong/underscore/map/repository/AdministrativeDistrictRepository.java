@@ -17,4 +17,5 @@ public interface AdministrativeDistrictRepository extends JpaRepository<Administ
     @Query("SELECT ad FROM AdministrativeDistrict ad WHERE ad.xLongitude BETWEEN :minXLongitude AND :maxXLongitude AND ad.yLatitude BETWEEN :minYLatitude AND :maxYLatitude")
     List<AdministrativeDistrict> findByXLongitudeBetweenAndYLatitudeBetween(double minXLongitude, double maxXLongitude, double minYLatitude, double maxYLatitude);
 
+
 }
