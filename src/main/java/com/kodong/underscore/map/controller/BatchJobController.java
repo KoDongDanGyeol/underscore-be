@@ -42,7 +42,6 @@ public class BatchJobController {
         this.businessAttractionInitJob = businessAttractionInitJob;
         this.administrativeDistrictRepository = administrativeDistrictRepository;
         this.businessAttractionUpdateJob = businessAttractionUpdateJob;
-
     }
 
     @GetMapping("/run-batch-job")
