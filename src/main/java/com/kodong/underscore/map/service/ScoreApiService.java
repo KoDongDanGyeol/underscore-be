@@ -3,6 +3,10 @@ package com.kodong.underscore.map.service;
 
 import com.kodong.underscore.map.data.*;
 import com.kodong.underscore.map.entity.*;
+import com.kodong.underscore.map.exception.ErrorCode;
+import com.kodong.underscore.map.exception.ExcessiveAreaRequestException;
+import com.kodong.underscore.map.exception.InvalidServiceIndustryCodeException;
+import com.kodong.underscore.map.exception.NoMatchingServiceIndustryException;
 import com.kodong.underscore.map.repository.*;
 import com.kodong.underscore.map.util.BusinessAttractionLabels;
 import lombok.RequiredArgsConstructor;
@@ -285,7 +289,8 @@ public class ScoreApiService {
      */
     private void checkTooMuchAdministrativeDistrict(List<AdministrativeDistrict> districts) {
         if(districts.size() > 20){
-            // TODO 20개가 넘는 개업 매력도를 표현해야 하는 경우 에러 발생
+            // 20개가 넘는 개업 매력도를 표현해야 하는 경우 에러 발생
+            throw new ExcessiveAreaRequestException(ErrorCode.EXCESSIVE_AREA_REQUEST);
         }
     }
 
@@ -322,11 +327,12 @@ public class ScoreApiService {
      * 업종 분야 코드가 정상인지 확인하는 부분
      * 빈 문자열이 넘어오면 에러 처리
      * DB에 없는 문자열이 넘어올 경우 에러처리
-     * @param serviceIndustryCode
+     * @param serviceIndustryCode 서비스업종분야코드
      */
     private String validateServiceIndustry(String serviceIndustryCode) {
         if(serviceIndustryCode == null || serviceIndustryCode.isEmpty()){
-            //TODO 업종분야 코드가 제대로 안넘어온 경우 에러처리
+            //업종분야 코드가 제대로 안넘어온 경우 에러처리
+            throw new InvalidServiceIndustryCodeException(ErrorCode.INVALID_SERVICE_INDUSTRY_CODE);
         }
 
         List<ServiceIndustry> availableIndustryCodes = globalData.getServiceIndustryList();
@@ -338,7 +344,8 @@ public class ScoreApiService {
             }
         }
         if(!hasMatchingServiceIndustry){
-            // TODO 업종분야 코드가 매칭되는게 없는 경우 에러처리
+            // 업종분야 코드가 매칭되는게 없는 경우 에러처리
+            throw new NoMatchingServiceIndustryException(ErrorCode.NO_MATCHING_SERVICE_INDUSTRY);
         }
 
         return serviceIndustryCode;
@@ -377,11 +384,12 @@ public class ScoreApiService {
      * @return 범위 내에 포함된 행정동 List
      */
     private List<AdministrativeDistrict> getAdministrativeDistrictInRange(BusinessAttractionRequestData requestData) {
-        return administrativeDistrictRepository.findByXLongitudeBetweenAndYLatitudeBetween(
+        List<AdministrativeDistrict> districtsInRange =  administrativeDistrictRepository.findByXLongitudeBetweenAndYLatitudeBetween(
                 requestData.getMinXLongitude(),
                 requestData.getMaxXLongitude(),
                 requestData.getMinYLatitude(),
                 requestData.getMaxYLatitude()
         );
+        return districtsInRange;
     }
 }
