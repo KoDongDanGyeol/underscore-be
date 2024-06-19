@@ -47,19 +47,22 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         log.info("token success..");
 
-        response.setHeader("access", accessToken);
-        response.addCookie(createCookie("refresh", refreshToken));
+        //response.setHeader("access", accessToken);
+        response.addCookie(createCookie("refresh", refreshToken,request.isSecure()));
+        response.addCookie(createCookie("access", accessToken,request.isSecure()));
         response.setStatus(HttpStatus.OK.value());
 
         // todo 추후 수정
-        response.sendRedirect("http://localhost:3000/auth/join/complete");
+        response.sendRedirect("https://underscore.or.kr/auth/welcome");
     }
 
-    private Cookie createCookie(String key, String value) {
+    private Cookie createCookie(String key, String value,boolean isSecure) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60*60*60);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setSecure(isSecure); // 요청이 HTTPS인 경우만 Secure 설정
+        // cookie.setSameSite("None"); 크로스 도메인에서도 쿠키 전송 가능;
 
         return cookie;
     }
