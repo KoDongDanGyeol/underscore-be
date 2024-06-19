@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -49,35 +48,21 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("token success..");
 
         //response.setHeader("access", accessToken);
-
-        //test용
-        response.addHeader("Set-Cookie", createResponseCooke("access",accessToken).toString());
-        response.addHeader("Set-Cookie", createResponseCooke("refresh",refreshToken).toString());
-
-        //response.addCookie(createCookie("refresh", refreshToken));
-        //response.addCookie(createCookie("access", accessToken,request.isSecure()));
+        response.addCookie(createCookie("refresh", refreshToken,request.isSecure()));
+        response.addCookie(createCookie("access", accessToken,request.isSecure()));
         response.setStatus(HttpStatus.OK.value());
 
         // todo 추후 수정
-        response.sendRedirect("https://underscore.or.kr/auth/welcome/");
+        response.sendRedirect("https://underscore.or.kr/auth/welcome");
     }
 
     private Cookie createCookie(String key, String value,boolean isSecure) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60*60*60);
         cookie.setPath("/");
-
-
-        return cookie;
-    }
-
-    private ResponseCookie createResponseCooke(String key, String value) {
-        ResponseCookie cookie = ResponseCookie.from(key, value)
-                .domain(".underscore.or.kr")
-                .path("/")
-                .maxAge(60*60*60)
-                .sameSite("None")
-                .build();
+        cookie.setHttpOnly(true);
+        cookie.setSecure(isSecure); // 요청이 HTTPS인 경우만 Secure 설정
+        // cookie.setSameSite("None"); 크로스 도메인에서도 쿠키 전송 가능;
 
         return cookie;
     }
