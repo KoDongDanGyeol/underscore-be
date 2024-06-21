@@ -21,9 +21,9 @@ jobs:
             cd underscore-be
          
             # 외부에 노출되면 안되는 값들 설정
-            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-            echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
-            echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> .env
+            # echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+            # echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
+            # echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> .env
             
             docker-compose down
             git pull origin release
