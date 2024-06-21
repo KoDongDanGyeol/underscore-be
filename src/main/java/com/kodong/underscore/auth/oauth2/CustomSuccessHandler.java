@@ -62,10 +62,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.sendRedirect("https://underscore.or.kr/auth/welcome/");
     }
 
-    private Cookie createCookie(String key, String value) {
+    private Cookie createCookie(String key, String value,boolean isSecure) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60*60*60);
         cookie.setPath("/");
+
 
         return cookie;
     }
