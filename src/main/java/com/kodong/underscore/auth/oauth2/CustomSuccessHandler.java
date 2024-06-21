@@ -76,7 +76,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .path("/")
                 .maxAge(60*60*60)
                 .sameSite("None")
-                .secure(isSecure) // Secure 속성 설정
+                .secure(true) // Secure 속성 설정
                 .httpOnly(true) // HttpOnly 속성 설정
                 .build();
 
