@@ -51,8 +51,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //response.setHeader("access", accessToken);
 
         //test용
-        response.addHeader("Set-Cookie", createResponseCooke("access",accessToken).toString());
-        response.addHeader("Set-Cookie", createResponseCooke("refresh",refreshToken).toString());
+        response.addHeader("Set-Cookie", createResponseCookie("access", accessToken, request.isSecure()));
+        response.addHeader("Set-Cookie", createResponseCookie("refresh", refreshToken, request.isSecure()));
 
         //response.addCookie(createCookie("refresh", refreshToken));
         //response.addCookie(createCookie("access", accessToken,request.isSecure()));
@@ -67,19 +67,20 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         cookie.setMaxAge(60*60*60);
         cookie.setPath("/");
 
-
         return cookie;
     }
 
-    private ResponseCookie createResponseCooke(String key, String value) {
+    private String createResponseCookie(String key, String value, boolean isSecure) {
         ResponseCookie cookie = ResponseCookie.from(key, value)
                 .domain(".underscore.or.kr")
                 .path("/")
                 .maxAge(60*60*60)
                 .sameSite("None")
+                .secure(isSecure) // Secure 속성 설정
+                .httpOnly(true) // HttpOnly 속성 설정
                 .build();
 
-        return cookie;
+        return cookie.toString();
     }
 
     private void saveRefreshToken(String username, String token, Long expiredMs) {
