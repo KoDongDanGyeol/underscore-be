@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,8 +70,8 @@ public class ReissueService {
         addRefreshToken(username, refreshToken, 86400000L);
 
         // response
-        response.setHeader("access", newAccessToken);
-        response.addCookie(createCookie("refresh", newRefreshToken));
+        response.addHeader("Set-Cookie",createResponseCookie("access", newAccessToken));
+        response.addHeader("Set-Cookie",createResponseCookie("refresh", newRefreshToken));
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -81,6 +82,18 @@ public class ReissueService {
         cookie.setHttpOnly(true);
 
         return cookie;
+    }
+
+    private String createResponseCookie(String key, String value) {
+        ResponseCookie cookie = ResponseCookie.from(key, value)
+                .domain(".underscore.or.kr")
+                .path("/")
+                .maxAge(60*60*60)
+                .sameSite("None")
+                .secure(true) // Secure 속성 설정
+                .build();
+
+        return cookie.toString();
     }
 
     private void addRefreshToken(String username, String token, Long expiredMs) {
