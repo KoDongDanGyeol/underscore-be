@@ -51,15 +51,15 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //response.setHeader("access", accessToken);
 
         //test용
-        response.addHeader("Set-Cookie", createResponseCookie("access", accessToken, request.isSecure()));
-        response.addHeader("Set-Cookie", createResponseCookie("refresh", refreshToken, request.isSecure()));
+        response.addHeader("Set-Cookie", createResponseCookie("access", accessToken));
+        response.addHeader("Set-Cookie", createResponseCookie("refresh", refreshToken));
 
         //response.addCookie(createCookie("refresh", refreshToken));
         //response.addCookie(createCookie("access", accessToken,request.isSecure()));
         response.setStatus(HttpStatus.OK.value());
 
         // todo 추후 수정
-        response.sendRedirect("https://underscore.or.kr/auth/welcome/");
+        response.sendRedirect("https://underscore.or.kr/auth/welcome");
     }
 
     private Cookie createCookie(String key, String value,boolean isSecure) {
@@ -70,14 +70,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         return cookie;
     }
 
-    private String createResponseCookie(String key, String value, boolean isSecure) {
+    private String createResponseCookie(String key, String value) {
         ResponseCookie cookie = ResponseCookie.from(key, value)
                 .domain(".underscore.or.kr")
                 .path("/")
                 .maxAge(60*60*60)
                 .sameSite("None")
                 .secure(true) // Secure 속성 설정
-                .httpOnly(true) // HttpOnly 속성 설정
                 .build();
 
         return cookie.toString();
