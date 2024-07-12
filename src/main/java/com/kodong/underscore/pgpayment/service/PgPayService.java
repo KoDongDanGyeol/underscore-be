@@ -2,15 +2,12 @@ package com.kodong.underscore.pgpayment.service;
 
 import com.kodong.underscore.auth.entity.User;
 import com.kodong.underscore.auth.repository.UserRepository;
-import com.kodong.underscore.pgpayment.dto.PaymentHistoryDto;
-import com.kodong.underscore.pgpayment.dto.PaymentHistoryList;
 import com.kodong.underscore.pgpayment.dto.PaymentInfoDto;
 import com.kodong.underscore.pgpayment.entity.Membership;
 import com.kodong.underscore.pgpayment.entity.TossPayment;
 import com.kodong.underscore.pgpayment.repository.MemberShipRepository;
 import com.kodong.underscore.pgpayment.repository.PaymentsRepository;
 
-import com.kodong.underscore.pgpayment.repository.TossPaymentsSpecs;
 import com.kodong.underscore.pgpayment.request.PaymentApprove;
 import com.kodong.underscore.pgpayment.response.TossPayApprove;
 
@@ -145,42 +142,6 @@ public class PgPayService {
 
         return billingDate;
     }
-
-
-
-    //특정 회원 결제내역
-    public PaymentHistoryList getPaymentsHistory(Long userId, String paymentStatus, Pageable pageable){
-
-        Specification<TossPayment> spec = Specification.where(TossPaymentsSpecs.hasUserId(userId));
-
-        if(paymentStatus != null && !paymentStatus.isBlank()){
-            spec = spec.and(TossPaymentsSpecs.hasPaymentStatus(paymentStatus));
-        }
-
-
-        int totalPayments = (int) paymentsRepository.count(spec);
-
-        Page<TossPayment> payments = paymentsRepository.findAll(spec, pageable);
-
-
-
-        Page<PaymentHistoryDto> paymentHistory = payments.map(payment -> PaymentHistoryDto.builder()
-                .orderId(payment.getOrderId())
-                .orderName(payment.getOrderName())
-                .method(payment.getMethod())
-                .approvedAtDate(payment.getApprovedAtDate())
-                .paymentStatus(payment.getPaymentStatus())
-                .billingDate(payment.getBillingDate())
-                .amount(payment.getAmount())
-                .receiptUrl(payment.getReceiptUrl())
-                .build()
-        );
-
-        return new PaymentHistoryList(paymentHistory,totalPayments);
-
-    }
-
-
 
 
 
