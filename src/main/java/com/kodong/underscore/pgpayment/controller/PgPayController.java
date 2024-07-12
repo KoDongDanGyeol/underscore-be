@@ -52,26 +52,6 @@ public class PgPayController {
 
 
 
-    //결제 내역 조회
-    @GetMapping("{userId}/payment-history")
-    public ResponseEntity<PaymentHistoryList> getPayments(@PathVariable("userId") Long userId,
-                                                          @RequestParam(value = "page", defaultValue = "0") int page,
-                                                          @RequestParam(value="size",defaultValue = "5") int size,
-                                                          @RequestParam(value = "paymentStatus",required = false) String paymentStatus){
-        log.info("userId={}",userId);
-        log.info("paymentStatus={}",paymentStatus);
-
-        Pageable pageable = PageRequest.of(page, size);
-        PaymentHistoryList paymentsHistory = pgPayService.getPaymentsHistory(userId, paymentStatus, pageable);
-
-
-        return ResponseEntity.ok(paymentsHistory);
-
-
-    }
-
-
-
 
 
 
