@@ -2,18 +2,16 @@ package com.kodong.underscore.pgpayment.service;
 
 import com.kodong.underscore.auth.entity.User;
 import com.kodong.underscore.auth.repository.UserRepository;
-import com.kodong.underscore.pgpayment.dto.PaymentHistoryDto;
-import com.kodong.underscore.pgpayment.dto.PaymentHistoryList;
-import com.kodong.underscore.pgpayment.dto.PaymentInfoDto;
+import com.kodong.underscore.pgpayment.dto.*;
 import com.kodong.underscore.pgpayment.entity.Membership;
 import com.kodong.underscore.pgpayment.entity.TossPayment;
 import com.kodong.underscore.pgpayment.repository.MemberShipRepository;
 import com.kodong.underscore.pgpayment.repository.PaymentsRepository;
-
 import com.kodong.underscore.pgpayment.repository.TossPaymentsSpecs;
+import com.kodong.underscore.pgpayment.request.CancelUserInfo;
 import com.kodong.underscore.pgpayment.request.PaymentApprove;
 import com.kodong.underscore.pgpayment.response.TossPayApprove;
-
+import com.kodong.underscore.pgpayment.response.TossPayCancel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -133,20 +131,6 @@ public class PgPayService {
 
     }
 
-
-
-
-
-
-
-    private LocalDate calculateBillingDate(LocalDate approvedAtDate) {
-
-        LocalDate billingDate = approvedAtDate.plusMonths(1);
-
-        return billingDate;
-    }
-
-
     //특정 회원 결제내역
     public PaymentHistoryList getPaymentsHistory(Long userId,String paymentStatus, Pageable pageable){
 
@@ -184,10 +168,173 @@ public class PgPayService {
 
 
 
+    private LocalDate calculateBillingDate(LocalDate approvedAtDate) {
+
+        LocalDate billingDate = approvedAtDate.plusMonths(1);
+
+        return billingDate;
+    }
 
 
 
 
+
+
+    //전체 환불
+    public PaymentCancelDto CancelPayment(CancelInfo cancelInfo, Long userId){
+
+        String paymentKey = cancelInfo.getPaymentKey();
+        String cancelReason = cancelInfo.getCancelReason();
+
+        TossPayment payment = paymentsRepository.findByUserIdAndPaymentKey(userId, paymentKey);
+        int amount = payment.getAmount();
+
+
+        CancelUserInfo cancelUserInfo = CancelUserInfo.builder()
+                .cancelReason(cancelReason)
+                .cancelAmount(amount)
+                .build();
+
+
+
+
+
+            TossPayCancel tossPayCancel = CancelTossPayments(cancelUserInfo,paymentKey);
+            TossPayCancel.Cancel cancels = tossPayCancel.getCancels()[0];
+            String cancelStatus = cancels.getCancelStatus();
+
+            String canceledAt = cancels.getCanceledAt();
+            String[] cancelDateAndTime = canceledAt.split("T");
+            String canceledDate = cancelDateAndTime[0];
+            String canceledTime = cancelDateAndTime[1];
+
+            log.info("canceledDate = {}",canceledDate);
+            log.info("canceledTime = {}",canceledTime);
+
+
+
+
+            if(Objects.equals(cancelStatus, "DONE"))
+                cancelStatus = "환불완료";
+
+
+            PaymentCancelDto cancelDto = PaymentCancelDto.builder()
+                    .cancelReason(cancels.getCancelReason())
+                    .canceledAtDate(canceledDate)
+                    .canceledAtTime(canceledTime)
+                    .cancelAmount(cancels.getCancelAmount())
+                    .cancelStatus(cancelStatus)
+                    .build();
+
+            return cancelDto;
+
+
+
+
+
+
+
+
+    }
+
+
+    public PaymentCancelDto CancelPaymentPartial(CancelInfo cancelInfo, Long userId){
+        String paymentKey = cancelInfo.getPaymentKey();
+        String cancelReason = cancelInfo.getCancelReason();
+
+
+        //결제일 가져오기
+        TossPayment payment = paymentsRepository.findByUserIdAndPaymentKey(userId, paymentKey);
+        LocalDate approvedAtDate = payment.getApprovedAtDate();
+
+        //유저가 가입한 멤버십 정보 가져오기
+        Optional<User> user = userRepository.findById(userId);
+        User userInfo = user.get();
+        Membership membership = userInfo.getMembership();
+
+        int duration = membership.getDuration();
+        int amount = membership.getAmount();
+
+        int period = 0;
+
+        //1은 한달, 12는 1년
+        if(duration == 1)
+            period = 30;
+        else if(duration == 12)
+            period = 365;
+
+
+
+        LocalDate today = LocalDate.now();
+        long days = ChronoUnit.DAYS.between(approvedAtDate, today);//결제일과 현재 날짜 차이
+
+        int refundableAmount = 0;
+
+        if(days < (period / 3)){
+            refundableAmount = (amount * 2) / 3;
+        }else if(days < Math.round(((double) period /2))){
+            refundableAmount = amount / 2;
+
+        }
+
+        CancelUserInfo cancelUserInfo = CancelUserInfo.builder()
+                .cancelReason(cancelReason)
+                .cancelAmount(refundableAmount)
+                .build();
+
+
+        TossPayCancel tossPayCancel = CancelTossPayments(cancelUserInfo, paymentKey);
+
+        TossPayCancel.Cancel cancels = tossPayCancel.getCancels()[0];
+        String cancelStatus = cancels.getCancelStatus();
+
+        String canceledAt = cancels.getCanceledAt();
+        String[] cancelDateAndTime = canceledAt.split("T");
+        String canceledDate = cancelDateAndTime[0];
+        String canceledTime = cancelDateAndTime[1];
+
+        log.info("canceledDate = {}",canceledDate);
+        log.info("canceledTime = {}",canceledTime);
+
+
+
+
+        if(Objects.equals(cancelStatus, "DONE"))
+            cancelStatus = "환불완료";
+
+
+        PaymentCancelDto cancelDto = PaymentCancelDto.builder()
+                .cancelReason(cancels.getCancelReason())
+                .canceledAtDate(canceledDate)
+                .canceledAtTime(canceledTime)
+                .cancelAmount(cancels.getCancelAmount())
+                .cancelStatus(cancelStatus)
+                .build();
+
+        return cancelDto;
+
+
+
+    }
+
+    //토스페이먼츠 결제 취소 요청
+    private TossPayCancel CancelTossPayments(CancelUserInfo cancelUserInfo,String paymentKey) {
+        HttpHeaders headers = createHeader();
+        RestTemplate restTemplate = new RestTemplate();
+
+
+
+        HttpEntity<CancelUserInfo> request = new HttpEntity<>(cancelUserInfo,headers);
+
+        String url = "https://api.tosspayments.com/v1/payments/"+paymentKey+"/cancel";
+
+        TossPayCancel tossPayCancel = restTemplate.postForObject(url, request, TossPayCancel.class);
+
+
+
+        return tossPayCancel;
+
+    }
 
 
 
